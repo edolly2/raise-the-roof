@@ -1,0 +1,24 @@
+header {
+    background-color: darkblue;
+    /* padding: var(--space-sm); */
+}
+
+.header-btn {
+  /* padding: calc(var(--space-xs) * 0.5) var(--space-xs); */
+  /* font-size: var(--font-xs);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  background-color: yellow;
+  color: darkblue;
+  transition: background-color 0.3s; */
+  /* height: calc(var(--base-size) / var(--golden-ratio)); */
+  /* padding: calc(var(--base-size) + var(--base-size) * 1.618); */
+  /* height: 4rem; */
+  /* width: 12rem; */
+  
+}

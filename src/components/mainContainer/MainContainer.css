@@ -1,0 +1,5 @@
+main {
+  padding: var(--space-sm);
+  /* position: relative; */
+  margin: var(--space-xl) auto;
+}

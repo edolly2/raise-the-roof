@@ -1,0 +1,119 @@
+/* golden-ratio.css */
+
+/* --- Root Variables --- */
+:root {
+  /* Base font size (smallest) */
+  --base-size: 18px;
+  --golden-ratio: 1.618;
+
+  /* Typography scale */
+  --font-xs: var(--base-size);                            /* 18px */
+  --font-sm: calc(var(--base-size) * var(--golden-ratio));           /* ~29px */
+  --font-md: calc(var(--base-size) * var(--golden-ratio) * var(--golden-ratio)); /* ~46px */
+  --font-lg: calc(var(--base-size) * var(--golden-ratio) * var(--golden-ratio) * var(--golden-ratio)); /* ~75px */
+  --font-xl: calc(var(--base-size) * var(--golden-ratio) * var(--golden-ratio) * var(--golden-ratio) * var(--golden-ratio)); /* ~121px */
+
+  /* Spacing */
+  --space-xs: var(--base-size);                                      /* 18px */
+  --space-sm: calc(var(--base-size) * var(--golden-ratio));           /* ~29px */
+  --space-md: calc(var(--base-size) * var(--golden-ratio) * var(--golden-ratio)); /* ~46px */
+  --space-lg: calc(var(--base-size) * var(--golden-ratio) * var(--golden-ratio) * var(--golden-ratio)); /* ~75px */
+
+  /* Border radius */
+  --radius: calc(var(--base-size) / var(--golden-ratio));             /* ~11px */
+}
+
+/* --- Typography --- */
+body {
+  font-size: var(--font-xs);
+  /* font-family: Arial, sans-serif; */
+  /* color: #222; */
+}
+
+h1 { font-size: var(--font-xl); margin-bottom: var(--space-lg); }
+h2 { font-size: var(--font-lg); margin-bottom: var(--space-lg); }
+h3 { font-size: var(--font-md); margin-bottom: var(--space-md); }
+p  { font-size: var(--font-sm); margin-bottom: var(--space-md); }
+small { font-size: calc(var(--font-xs) / var(--golden-ratio)); }
+
+/* --- Layout & Grid --- */
+/* .container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+}
+
+.main {
+  flex: 1.618;
+  padding: var(--space-md);
+}
+
+.sidebar {
+  flex: 1;
+  padding: var(--space-md);
+} */
+
+/* --- Cards --- */
+/* .card {
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  border-radius: var(--radius);
+  box-shadow: 0 0 calc(var(--base-size) / 2) rgba(0,0,0,0.1);
+  background-color: #fff;
+} */
+
+/* --- Buttons --- */
+/* button {
+  padding: calc(var(--space-xs) * 0.5) var(--space-sm);
+  font-size: var(--font-sm);
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  background-color: #0077cc;
+  color: white;
+  transition: background-color 0.3s;
+} */
+
+button:hover {
+  background-color: #005fa3;
+}
+
+/* --- Utility Spacing Classes --- */
+.m-sm { margin: var(--space-sm); }
+.m-md { margin: var(--space-md); }
+.m-lg { margin: var(--space-lg); }
+.p-sm { padding: var(--space-sm); }
+.p-md { padding: var(--space-md); }
+.p-lg { padding: var(--space-lg); }
+
+/* --- Images --- */
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-row {
+    flex-direction: row;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.align-center {
+    align-items: center;
+}
+
+.space-between {
+    justify-content: space-between;
+}
