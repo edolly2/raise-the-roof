@@ -1,26 +1,68 @@
-/* golden-ratio.css */
 
 /* --- Root Variables --- */
 :root {
   /* Base font size (smallest) */
-  --base-size: 18px;
+   --base-size: 1.125rem; /* 18px */
+  --space-base: 1.25rem
   --golden-ratio: 1.618;
 
+  h1 {
+  font-size: clamp(3rem, 6vw, 5.832rem); /* ~base * ratio^3 */
+  /* margin-bottom: calc(var(--space-base) * 2.618); */
+}
+
+h2 {
+  font-size: clamp(2rem, 5vw, 3.618rem); /* ~base * ratio^2 */
+  /* margin-bottom: calc(var(--space-base) * 2); */
+}
+
+h3 {
+  font-size: clamp(1.618rem, 4vw, 2.236rem); /* ~base * ratio^1 */
+  /* margin-bottom: calc(var(--space-base) * 1.618); */
+}
+
+h4 {
+  font-size: clamp(1.382rem, 3vw, 1.618rem); /* slightly above paragraph */
+  /* margin-bottom: var(--space-base); */
+}
+
+p {
+  font-size: clamp(1.125rem, 2.2vw, 1.618rem); /* min 18px */
+  /* margin-bottom: var(--space-base); */
+}
+
+small {
+  font-size: clamp(0.9rem, 1.8vw, 1.125rem); /* slightly smaller than paragraph */
+}
+
   /* Typography scale */
-  --font-xs: var(--base-size);                            /* 18px */
-  --font-sm: calc(var(--base-size) * var(--golden-ratio));           /* ~29px */
-  --font-md: calc(var(--base-size) * var(--golden-ratio) * var(--golden-ratio)); /* ~46px */
-  --font-lg: calc(var(--base-size) * var(--golden-ratio) * var(--golden-ratio) * var(--golden-ratio)); /* ~75px */
-  --font-xl: calc(var(--base-size) * var(--golden-ratio) * var(--golden-ratio) * var(--golden-ratio) * var(--golden-ratio)); /* ~121px */
+  --font-xs: var(--base-size); /* 18px */
+  --font-sm: calc(var(--base-size) * var(--golden-ratio)); /* ~29px */
+  --font-md: calc(
+    var(--base-size) * var(--golden-ratio) * var(--golden-ratio)
+  ); /* ~46px */
+  --font-lg: calc(
+    var(--base-size) * var(--golden-ratio) * var(--golden-ratio) *
+      var(--golden-ratio)
+  ); /* ~75px */
+  --font-xl: calc(
+    var(--base-size) * var(--golden-ratio) * var(--golden-ratio) *
+      var(--golden-ratio) * var(--golden-ratio)
+  ); /* ~121px */
 
   /* Spacing */
-  --space-xs: var(--base-size);                                      /* 18px */
-  --space-sm: calc(var(--base-size) * var(--golden-ratio));           /* ~29px */
-  --space-md: calc(var(--base-size) * var(--golden-ratio) * var(--golden-ratio)); /* ~46px */
-  --space-lg: calc(var(--base-size) * var(--golden-ratio) * var(--golden-ratio) * var(--golden-ratio)); /* ~75px */
+  --space-xs: var(--base-size); /* 18px */
+  --space-sm: calc(var(--base-size) * var(--golden-ratio)); /* ~29px */
+  --space-md: calc(
+    var(--base-size) * var(--golden-ratio) * var(--golden-ratio)
+  ); /* ~46px */
+  --space-lg: calc(
+    var(--base-size) * var(--golden-ratio) * var(--golden-ratio) *
+      var(--golden-ratio)
+  ); /* ~75px */
 
   /* Border radius */
-  --radius: calc(var(--base-size) / var(--golden-ratio));             /* ~11px */
+  --radius: calc(var(--base-size) / var(--golden-ratio)); /* ~11px */
 }
 
 /* --- Typography --- */
@@ -29,12 +71,6 @@ body {
   /* font-family: Arial, sans-serif; */
   /* color: #222; */
 }
-
-h1 { font-size: var(--font-xl); margin-bottom: var(--space-lg); }
-h2 { font-size: var(--font-lg); margin-bottom: var(--space-lg); }
-h3 { font-size: var(--font-md); margin-bottom: var(--space-md); }
-p  { font-size: var(--font-sm); margin-bottom: var(--space-md); }
-small { font-size: calc(var(--font-xs) / var(--golden-ratio)); }
 
 /* --- Layout & Grid --- */
 /* .container {
@@ -80,12 +116,24 @@ button:hover {
 }
 
 /* --- Utility Spacing Classes --- */
-.m-sm { margin: var(--space-sm); }
-.m-md { margin: var(--space-md); }
-.m-lg { margin: var(--space-lg); }
-.p-sm { padding: var(--space-sm); }
-.p-md { padding: var(--space-md); }
-.p-lg { padding: var(--space-lg); }
+.m-sm {
+  margin: var(--space-sm);
+}
+.m-md {
+  margin: var(--space-md);
+}
+.m-lg {
+  margin: var(--space-lg);
+}
+.p-sm {
+  padding: var(--space-sm);
+}
+.p-md {
+  padding: var(--space-md);
+}
+.p-lg {
+  padding: var(--space-lg);
+}
 
 /* --- Images --- */
 img {
@@ -95,25 +143,25 @@ img {
 }
 
 .flex {
-    display: flex;
+  display: flex;
 }
 
 .flex-row {
-    flex-direction: row;
+  flex-direction: row;
 }
 
 .flex-col {
-    flex-direction: column;
+  flex-direction: column;
 }
 
 .justify-center {
-    justify-content: center;
+  justify-content: center;
 }
 
 .align-center {
-    align-items: center;
+  align-items: center;
 }
 
 .space-between {
-    justify-content: space-between;
+  justify-content: space-between;
 }

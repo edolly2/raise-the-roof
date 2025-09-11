@@ -1,0 +1,142 @@
+/* ------------------------------
+   1) START ROOT
+   ------------------------------ */
+:root {
+  /* Golden ratio constant */
+  --golden-ratio: 1.618;
+
+  /* Base sizes */
+  --base-size: 1.125rem; /* 18px */
+  --space-base: 1.25rem /* 20px */
+
+  /* Typography scale (φ progression) */
+  --fs-xs: calc(var(--base-size) / var(--golden-ratio)); /* ~10px */
+  --fs-sm: var(--base-size); /* 16px */
+  --fs-md: calc(var(--base-size) * var(--golden-ratio)); /* ~26px */
+  --fs-lg: calc(var(--fs-md) * var(--golden-ratio)); /* ~42px */
+  --fs-xl: calc(var(--fs-lg) * var(--golden-ratio)); /* ~68px */
+
+  /* Font family */
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-mono: monospace;
+
+  /* Typography scale */
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono",
+    "Courier New", monospace;
+
+  --line-height: var(--golden-ratio);;
+  --heading-weight: 700;
+  --body-weight: 400;
+
+  /* Colors (tweakable) */
+  --color-primary: #000021;
+  --color-secondary: #E38512;
+  --color-bg: #c5c5c5;
+  --color-surface: #f8f9fb;
+  --color-text: #121f2e;
+  --color-muted: #6b7280;
+  --color-primary-600: #089e9d;
+  --color-danger: #ef4444;
+  --color-success: #10b981;
+
+  /* Spacing scale (φ progression) */
+  --space-xs: var(--space-base); /* 8px */
+  --space-sm: calc(var(--space-xs) * var(--golden-ratio)); /* ~13px */
+  --space-md: calc(var(--space-sm) * var(--golden-ratio)); /* ~21px */
+  --space-lg: calc(var(--space-md) * var(--golden-ratio)); /* ~34px */
+  --space-xl: calc(var(--space-lg) * var(--golden-ratio)); /* ~55px */
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-md: 0 6px 20px rgba(16, 24, 40, 0.08);
+
+  /* Container widths (φ proportion) */
+  --container-sm: 38.2%; /* 1/φ² */
+  --container-md: 61.8%; /* 1/φ */
+  --container-lg: 100%; /* full */
+}
+/* ------------------------------
+   1) END ROOT
+   ------------------------------ */
+
+/* ------------------------------
+   2) START RESET
+   ------------------------------ */   
+* {
+  box-sizing: border-box;
+}
+
+html {
+  box-sizing: border-box;
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  font-size: var(--base-size);
+  overflow-x: hidden;
+}
+
+html {
+  background-color: var(--bg);
+  color: var(--text);
+  line-height: var(--leading);
+}
+
+
+body {
+  font-family: "Helvetica", sans-serif;
+  font-size: var(--base-size);
+  line-height: var(--golden-ratio);
+  margin: 0;
+  padding: 0;
+}
+
+/* Make images responsive by default */
+img,
+picture,
+svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+/* ------------------------------
+   2) END RESET
+   ------------------------------ */
+
+h1 {
+  font-size: clamp(3rem, 6vw, 5.832rem); /* ~base * ratio^3 */
+  margin-bottom: calc(var(--space-base) * 2.618);
+}
+
+h2 {
+  font-size: clamp(2rem, 5vw, 3.618rem); /* ~base * ratio^2 */
+  margin-bottom: calc(var(--space-base) * 2);
+}
+
+h3 {
+  font-size: clamp(1.618rem, 4vw, 2.236rem); /* ~base * ratio^1 */
+  margin-bottom: calc(var(--space-base) * 1.618);
+}
+
+h4 {
+  font-size: clamp(1.382rem, 3vw, 1.618rem); /* slightly above paragraph */
+  margin-bottom: var(--space-base);
+}
+
+p {
+  font-size: clamp(1.125rem, 2.2vw, 1.618rem); /* min 18px */
+  margin-bottom: var(--space-base);
+}
+
+small {
+  font-size: clamp(0.9rem, 1.8vw, 1.125rem); /* slightly smaller than paragraph */
+}

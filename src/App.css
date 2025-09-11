@@ -167,7 +167,10 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
-  font-family: var(--font-sans);
+  font-family: "Quattrocento", serif;
+  font-weight: 400;
+  font-style: normal;
+
   position: relative;
   overflow-x: hidden;
 }
@@ -182,6 +185,18 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 16px; /* base used by browsers; actual scaling via clamp below */
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Oswald", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 200;
+  font-style: normal;
 }
 
 img {

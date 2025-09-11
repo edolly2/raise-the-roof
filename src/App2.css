@@ -1,0 +1,460 @@
+/* ==========================================================================
+   golden-ratio.responsive.css
+   - Single-file vanilla CSS (2025 best practices)
+   - Golden ratio: phi = 1.618
+   - Fluid, responsive, and accessible (clamp, prefers-reduced-motion, custom props)
+   - Author: Eric Dollinger
+   ========================================================================== */
+
+/* -------------------------
+   1) Design system variables
+   ------------------------- */
+:root {
+  /* Golden ratio */
+  --phi: 1.618;
+
+  /* Viewport range used for fluid calculations */
+  --min-vw: 320; /* px */
+  --max-vw: 1600; /* px */
+
+  /* Base (root) fluid size */
+  --base-min: 1rem; /* 16px */
+  --base-max: 1.125rem; /* 18px */
+  --base-size: clamp(
+    var(--base-min),
+    calc(var(--base-min) + ((1vw - 3.2px) * 0.45)),
+    var(--base-max)
+  );
+
+  /* Modular scale (typographic steps using phi) */
+  --fs-0: var(--base-size); /* body / base text */
+  --fs-1: calc(var(--fs-0) * var(--phi)); /* h6 / small headings */
+  --fs-2: calc(var(--fs-1) * var(--phi)); /* h5 */
+  --fs-3: calc(var(--fs-2) * var(--phi)); /* h4 */
+  --fs-4: calc(var(--fs-3) * var(--phi)); /* h3 */
+  --fs-5: calc(var(--fs-4) * var(--phi)); /* h2 */
+  --fs-6: calc(var(--fs-5) * var(--phi)); /* h1 */
+
+  /* Smaller than base */
+  --fs--1: calc(var(--fs-0) / var(--phi)); /* captions / fine print */
+  --fs--2: calc(var(--fs--1) / var(--phi));
+
+  /* Line-height and vertical rhythm — use phi for harmonious rhythm */
+  --leading: 1.618;
+
+  /* Spacing system */
+  --space-unit: calc(var(--base-size) * 0.5); /* half base by default */
+  --space-1: var(--space-unit);
+  --space-2: calc(var(--space-1) * var(--phi));
+  --space-3: calc(var(--space-2) * var(--phi));
+  --space-4: calc(var(--space-3) * var(--phi));
+  --space-5: calc(var(--space-4) * var(--phi));
+
+  /* Border radius scaled to base */
+  --radius-sm: calc(var(--base-size) * 0.25);
+  --radius-md: calc(var(--base-size) * 0.5);
+  --radius-lg: calc(var(--base-size) * 0.85);
+
+  /* Buttons and control sizing (fluid) */
+  --btn-padding-y: calc(var(--space-1) * 0.75);
+  --btn-padding-x: calc(var(--space-2));
+  --btn-font: var(--fs-0);
+
+  /* Container constraints */
+  --container-max: 1200px;
+
+  /* Colors */
+  --bg: #ffffff;
+  --text: #0f1724;
+  --muted: #556074;
+  --accent: #0b79ff;
+  --accent-contrast: #ffffff;
+  --surface: #f7f9fb;
+  --focus: #ffb703;
+
+  /* Accessibility */
+  --focus-ring: 3px;
+}
+
+/* -------------------------
+   2) Global resets & sensible defaults
+   ------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* use fluid base-size for rem units */
+  font-size: var(--base-size);
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg);
+  color: var(--text);
+  line-height: var(--leading);
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-feature-settings: "liga" 1;
+  -moz-font-feature-settings: "liga" 1;
+}
+
+/* Make images responsive by default */
+img,
+picture,
+svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Remove default button styles while preserving accessibility */
+button {
+  font: inherit;
+  line-height: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+/* -------------------------
+   3) Typography tokens and semantic rules
+   ------------------------- */
+:root {
+  --type-xs: var(--fs--2);
+  --type-sm: var(--fs--1);
+  --type-base: var(--fs-0);
+  --type-lg: var(--fs-1);
+  --type-xl: var(--fs-2);
+  --type-2xl: var(--fs-3);
+  --type-3xl: var(--fs-4);
+  --type-4xl: var(--fs-5);
+  --type-5xl: var(--fs-6);
+}
+
+h1 {
+  font-size: var(--type-3xl);
+  margin: 0 0 calc(var(--space-2));
+  line-height: 1.07;
+}
+h2 {
+  font-size: var(--type-2xl);
+  margin: 0 0 calc(var(--space-2));
+  line-height: 1.12;
+}
+h3 {
+  font-size: var(--type-xl);
+  margin: 0 0 calc(var(--space-2));
+  line-height: 1.18;
+}
+h4 {
+  font-size: var(--type-xl);
+  margin: 0 0 calc(var(--space-1));
+  line-height: 1.25;
+}
+h5 {
+  font-size: var(--type-xl);
+  margin: 0 0 calc(var(--space-1));
+  line-height: 1.35;
+}
+h6 {
+  font-size: var(--type-xl);
+  margin: 0 0 calc(var(--space-1));
+  font-weight: 600;
+}
+
+p {
+  margin: 0 0 calc(var(--space-1));
+  font-size: var(--type-base);
+}
+
+/* Utility for small text */
+.small {
+  font-size: var(--type-sm);
+  color: var(--muted);
+}
+
+/* Inline code */
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono",
+    "Courier New", monospace;
+  font-size: calc(var(--type-base) * 0.95);
+  background: var(--surface);
+  padding: calc(var(--space-1) / 2);
+  border-radius: var(--radius-sm);
+  color: inherit;
+}
+
+/* -------------------------
+   4) Layout containers and grid
+   ------------------------- */
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-2);
+  padding-right: var(--space-2);
+}
+
+/* Simple responsive grid using CSS Grid */
+.row {
+  display: grid;
+  gap: var(--space-2);
+  grid-template-columns: repeat(12, 1fr);
+}
+
+.col-12 {
+  grid-column: span 12;
+}
+.col-6 {
+  grid-column: span 6;
+}
+.col-4 {
+  grid-column: span 4;
+}
+.col-3 {
+  grid-column: span 3;
+}
+
+/* Responsive breakpoints (use min-width mobile-first) */
+@media (max-width: 900px) {
+  .col-6 {
+    grid-column: span 12;
+  } /* stack on small screens */
+  .col-4 {
+    grid-column: span 6;
+  }
+  .col-3 {
+    grid-column: span 6;
+  }
+}
+
+/* -------------------------
+   5) Buttons & controls (accessible)
+   ------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--space-1) / 2);
+  padding: var(--btn-padding-y) var(--btn-padding-x);
+  font-size: var(--btn-font);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: transform 160ms cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 160ms;
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+/* Button variants */
+.btn--ghost {
+  background: transparent;
+  color: var(--accent);
+  border-color: rgba(11, 121, 255, 0.12);
+}
+
+.btn--secondary {
+  background: var(--surface);
+  color: var(--text);
+  border-color: rgba(15, 23, 36, 0.06);
+}
+
+/* Interactive states */
+.btn:active {
+  transform: translateY(1px) scale(0.998);
+}
+.btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 var(--focus-ring) var(--focus);
+  border-radius: calc(var(--radius-md) + 1px);
+}
+
+/* Size modifiers */
+.btn--sm {
+  padding: calc(var(--btn-padding-y) * 0.65) calc(var(--btn-padding-x) * 0.8);
+  font-size: calc(var(--btn-font) * 0.9);
+}
+.btn--lg {
+  padding: calc(var(--btn-padding-y) * 1.25) calc(var(--btn-padding-x) * 1.15);
+  font-size: calc(var(--btn-font) * 1.05);
+}
+
+/* Full width btn */
+.btn--full {
+  width: 100%;
+}
+
+/* -------------------------
+   6) Spacing utilities (fluid)
+   ------------------------- */
+/* Use sparingly — prefer semantic classes, but utilities are handy */
+.u-mt-1 {
+  margin-top: var(--space-1);
+}
+.u-mt-2 {
+  margin-top: var(--space-2);
+}
+.u-mt-3 {
+  margin-top: var(--space-3);
+}
+.u-mb-1 {
+  margin-bottom: var(--space-1);
+}
+.u-mb-2 {
+  margin-bottom: var(--space-2);
+}
+.u-p-1 {
+  padding: var(--space-1);
+}
+.u-p-2 {
+  padding: var(--space-2);
+}
+
+/* gap utilities for flex/grid */
+.u-gap-1 {
+  gap: var(--space-1);
+}
+.u-gap-2 {
+  gap: var(--space-2);
+}
+
+/* -------------------------
+   7) Forms (fluid, accessible)
+   ------------------------- */
+.input,
+textarea,
+select {
+  width: 100%;
+  font-size: var(--type-base);
+  padding: calc(var(--space-1) * 0.9);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(15, 23, 36, 0.08);
+  background: #fff;
+  color: var(--text);
+  transition: box-shadow 150ms, border-color 150ms;
+  line-height: 1.4;
+}
+
+.input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  box-shadow: 0 0 0 var(--focus-ring) var(--focus);
+}
+
+/* form layout helper */
+.form-row {
+  display: grid;
+  gap: var(--space-1);
+  grid-template-columns: 1fr 1fr;
+}
+@media (max-width: 700px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* -------------------------
+   8) Accessibility and media preferences
+   ------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast focus for keyboard users */
+:focus {
+  outline-offset: 2px;
+}
+
+/* Respect user font scaling and line length — limit measure */
+.prose {
+  max-width: 75ch; /* encourages comfortable reading measure */
+  margin: 0;
+}
+
+/* -------------------------
+   9) Utility helpers & small components
+   ------------------------- */
+.kv {
+  display: flex;
+  gap: var(--space-1);
+  align-items: baseline;
+}
+.badge {
+  display: inline-block;
+  padding: calc(var(--space-1) * 0.4) calc(var(--space-1) * 0.65);
+  font-size: calc(var(--type-sm));
+  border-radius: calc(var(--radius-sm) * 1.2);
+  background: var(--surface);
+}
+
+/* Simple card */
+.card {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: var(--space-2);
+  box-shadow: 0 6px 20px rgba(8, 15, 28, 0.04);
+  border: 1px solid rgba(8, 15, 28, 0.03);
+}
+
+/* Responsive image hero with golden-ratio aspect hint */
+.hero {
+  width: 100%;
+  aspect-ratio: 1.618 / 1; /* golden ratio aspect */
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* -------------------------
+   10) Progressive enhancement & print
+   ------------------------- */
+@media print {
+  :root {
+    color-scheme: light;
+  }
+  body {
+    background: white;
+    color: black;
+  }
+  .btn,
+  .no-print {
+    display: none !important;
+  }
+  .container {
+    padding: 0.5rem;
+  }
+}
+
+/* -------------------------
+   11) Example responsive tweaks (fine-grained)
+   ------------------------- */
+/* Tweak heading weights on small screens for better rhythm */
+@media (max-width: 480px) {
+  h1 {
+    font-size: calc(var(--type-4xl) * 0.95);
+  }
+  h2 {
+    font-size: calc(var(--type-3xl) * 0.95);
+  }
+}
+
+/* End of file */
