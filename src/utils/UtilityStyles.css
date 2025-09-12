@@ -1,39 +1,6 @@
 
 /* --- Root Variables --- */
-:root {
-  /* Base font size (smallest) */
-   --base-size: 1.125rem; /* 18px */
-  --space-base: 1.25rem
-  --golden-ratio: 1.618;
 
-  h1 {
-  font-size: clamp(3rem, 6vw, 5.832rem); /* ~base * ratio^3 */
-  /* margin-bottom: calc(var(--space-base) * 2.618); */
-}
-
-h2 {
-  font-size: clamp(2rem, 5vw, 3.618rem); /* ~base * ratio^2 */
-  /* margin-bottom: calc(var(--space-base) * 2); */
-}
-
-h3 {
-  font-size: clamp(1.618rem, 4vw, 2.236rem); /* ~base * ratio^1 */
-  /* margin-bottom: calc(var(--space-base) * 1.618); */
-}
-
-h4 {
-  font-size: clamp(1.382rem, 3vw, 1.618rem); /* slightly above paragraph */
-  /* margin-bottom: var(--space-base); */
-}
-
-p {
-  font-size: clamp(1.125rem, 2.2vw, 1.618rem); /* min 18px */
-  /* margin-bottom: var(--space-base); */
-}
-
-small {
-  font-size: clamp(0.9rem, 1.8vw, 1.125rem); /* slightly smaller than paragraph */
-}
 
   /* Typography scale */
   --font-xs: var(--base-size); /* 18px */
