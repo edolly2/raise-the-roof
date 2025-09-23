@@ -7,7 +7,11 @@
 
   /* Base sizes */
   --base-size: 1.125rem; /* 18px */
-  --space-base: 1.25rem /* 20px */
+  --space-base: 1.25rem; /* 20px */
+
+  /* Viewport range used for fluid calculations */
+  --min-vw: 320; /* px */
+  --max-vw: 1600; /* px */
 
   /* Typography scale (φ progression) */
   --fs-xs: calc(var(--base-size) / var(--golden-ratio)); /* ~10px */
@@ -26,18 +30,20 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono",
     "Courier New", monospace;
 
-  --line-height: var(--golden-ratio);;
+  --line-height: var(--golden-ratio);
   --heading-weight: 700;
   --body-weight: 400;
 
-  /* Colors (tweakable) */
+  /* Colors */
   --color-primary: #000021;
-  --color-secondary: #E38512;
-  --color-bg: #c5c5c5;
+  --color-primary-lite: #212174;
+  --color-secondary: #e38512;
+  --color-secondary-lite: #f0ae5d;
+  --color-bg: rgb(235, 235, 235);
   --color-surface: #f8f9fb;
-  --color-text: #121f2e;
+  --color-text: #212222;
   --color-muted: #6b7280;
-  --color-primary-600: #089e9d;
+  --color-cta: #089e9d;
   --color-danger: #ef4444;
   --color-success: #10b981;
 
@@ -68,8 +74,10 @@
 
 /* ------------------------------
    2) START RESET
-   ------------------------------ */   
-* {
+   ------------------------------ */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -85,32 +93,39 @@ html {
   overflow-x: hidden;
 }
 
-html {
-  background-color: var(--bg);
-  color: var(--text);
-  line-height: var(--leading);
+html,
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: var(--golden-ratio);
 }
-
 
 body {
   font-family: "Helvetica", sans-serif;
   font-size: var(--base-size);
-  line-height: var(--golden-ratio);
   margin: 0;
   padding: 0;
+  min-height: 100vh;
+  -webkit-font-feature-settings: "liga" 1;
+  -moz-font-feature-settings: "liga" 1;
+  font-feature-settings: "liga" 1;
 }
 
-/* Make images responsive by default */
-img,
-picture,
-svg {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
 /* ------------------------------
    2) END RESET
    ------------------------------ */
+
+/* -------------------------
+   3) START SENSIBLE DEFAULTS
+   ------------------------- */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+}
 
 h1 {
   font-size: clamp(3rem, 6vw, 5.832rem); /* ~base * ratio^3 */
@@ -135,8 +150,98 @@ h4 {
 p {
   font-size: clamp(1.125rem, 2.2vw, 1.618rem); /* min 18px */
   margin-bottom: var(--space-base);
+  line-height: var(--golden-ratio);
 }
 
 small {
-  font-size: clamp(0.9rem, 1.8vw, 1.125rem); /* slightly smaller than paragraph */
+  font-size: clamp(0.9rem, 1.8vw, 1.125rem);
 }
+
+/* Make images responsive by default */
+img,
+picture,
+svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+/* -------------------------
+   3) END SENSIBLE DEFAULTS
+   ------------------------- */
+
+/* -------------------------
+   4) Buttons & controls (accessible)
+   ------------------------- */
+.btn,
+button {
+  font: inherit;
+  line-height: inherit;
+  color: inherit;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--space-1) / 2);
+  /* padding: var(--btn-padding-y) var(--btn-padding-x); */
+  /* TODO: Make btn font size */
+  /* font-size: var(--btn-font); */
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: transform 160ms cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 160ms;
+  background: var(--color-cta);
+  /* TODO: Make better color */
+  color: var(--color-surface);
+}
+
+/* Button variants */
+.btn--ghost {
+  background: transparent;
+  color: var(--accent);
+  border-color: rgba(11, 121, 255, 0.12);
+}
+
+.btn--secondary {
+  background: var(--surface);
+  color: var(--text);
+  border-color: rgba(15, 23, 36, 0.06);
+}
+
+/* Interactive states */
+.btn:active {
+  transform: translateY(1px) scale(0.998);
+}
+.btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 var(--focus-ring) var(--focus);
+  border-radius: calc(var(--radius-md) + 1px);
+}
+
+/* Size modifiers */
+.btn--sm {
+  padding: calc(var(--btn-padding-y) * 0.65) calc(var(--btn-padding-x) * 0.8);
+  font-size: calc(var(--btn-font) * 0.9);
+}
+.btn--lg {
+  padding: calc(var(--btn-padding-y) * 1.25) calc(var(--btn-padding-x) * 1.15);
+  font-size: calc(var(--btn-font) * 1.05);
+}
+
+/* Full width btn */
+.btn--full {
+  width: 100%;
+}
+
+/* @media screen and (min-width: 20rem) {
+  html {
+    font-size: calc(0.8rem + 1.2 * ((100vw - 20rem) / 30));
+  }
+}
+
+@media screen and (min-width: 50rem) {
+  html {
+    font-size: 2rem;
+  }
+} */

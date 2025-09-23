@@ -1,12 +1,11 @@
 // import { useState } from "react";
-// import "./App4.css";
+import "./App.css";
 import Layout from "./layout/Layout";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./pages/home/HomePage";
 import AboutPage from "./pages/about/AboutPage";
 import ContactPage from "./pages/contact/ContactPage";
 import ServicesPage from "./pages/services/ServicesPage";
-import "./utils/UtilityStyles.css";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import MainContainer from "./components/mainContainer/MainContainer";

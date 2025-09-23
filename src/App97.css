@@ -11,20 +11,15 @@
    ------------------------- */
 :root {
   /* Golden ratio */
-  --phi: 1.618;
-
-  /* Viewport range used for fluid calculations */
-  --min-vw: 320; /* px */
-  --max-vw: 1600; /* px */
 
   /* Base (root) fluid size */
-  --base-min: 1rem; /* 16px */
-  --base-max: 1.125rem; /* 18px */
+  /* --base-min: 1rem;
+  --base-max: 1.125rem; 
   --base-size: clamp(
     var(--base-min),
     calc(var(--base-min) + ((1vw - 3.2px) * 0.45)),
     var(--base-max)
-  );
+  ); */
 
   /* Modular scale (typographic steps using phi) */
   --fs-0: var(--base-size); /* body / base text */
@@ -41,14 +36,6 @@
 
   /* Line-height and vertical rhythm — use phi for harmonious rhythm */
   --leading: 1.618;
-
-  /* Spacing system */
-  --space-unit: calc(var(--base-size) * 0.5); /* half base by default */
-  --space-1: var(--space-unit);
-  --space-2: calc(var(--space-1) * var(--phi));
-  --space-3: calc(var(--space-2) * var(--phi));
-  --space-4: calc(var(--space-3) * var(--phi));
-  --space-5: calc(var(--space-4) * var(--phi));
 
   /* Border radius scaled to base */
   --radius-sm: calc(var(--base-size) * 0.25);
@@ -79,32 +66,14 @@
 /* -------------------------
    2) Global resets & sensible defaults
    ------------------------- */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
 
-body {
-  margin: 0;
+/* body {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  background-color: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  -webkit-font-feature-settings: "liga" 1;
-  -moz-font-feature-settings: "liga" 1;
-}
+  
+} */
 
 /* Remove default button styles while preserving accessibility */
-button {
-  font: inherit;
-  line-height: inherit;
-  color: inherit;
-  background: none;
-  border: none;
-  padding: 0;
-}
 
 /* -------------------------
    3) Typography tokens and semantic rules
@@ -217,64 +186,6 @@ code {
   .col-3 {
     grid-column: span 6;
   }
-}
-
-/* -------------------------
-   5) Buttons & controls (accessible)
-   ------------------------- */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: calc(var(--space-1) / 2);
-  padding: var(--btn-padding-y) var(--btn-padding-x);
-  font-size: var(--btn-font);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  user-select: none;
-  text-decoration: none;
-  border: 1px solid transparent;
-  transition: transform 160ms cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 160ms;
-  background: var(--accent);
-  color: var(--accent-contrast);
-}
-
-/* Button variants */
-.btn--ghost {
-  background: transparent;
-  color: var(--accent);
-  border-color: rgba(11, 121, 255, 0.12);
-}
-
-.btn--secondary {
-  background: var(--surface);
-  color: var(--text);
-  border-color: rgba(15, 23, 36, 0.06);
-}
-
-/* Interactive states */
-.btn:active {
-  transform: translateY(1px) scale(0.998);
-}
-.btn:focus {
-  outline: none;
-  box-shadow: 0 0 0 var(--focus-ring) var(--focus);
-  border-radius: calc(var(--radius-md) + 1px);
-}
-
-/* Size modifiers */
-.btn--sm {
-  padding: calc(var(--btn-padding-y) * 0.65) calc(var(--btn-padding-x) * 0.8);
-  font-size: calc(var(--btn-font) * 0.9);
-}
-.btn--lg {
-  padding: calc(var(--btn-padding-y) * 1.25) calc(var(--btn-padding-x) * 1.15);
-  font-size: calc(var(--btn-font) * 1.05);
-}
-
-/* Full width btn */
-.btn--full {
-  width: 100%;
 }
 
 /* -------------------------

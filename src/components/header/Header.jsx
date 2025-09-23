@@ -1,26 +1,25 @@
-import { useState } from "react";
+// import { useState } from "react";
 import Wrapper from "../../layout/Wrapper";
 import Nav from "../navigation/Nav";
 import SiteBrand from "../siteBrand/SiteBrand";
 import "./Header.css";
-// import "../../utils/UtilityStyles.css";
 
 const Header = () => {
   // TODO:Call to action
 
-  const [hovered, setHovered] = useState(false);
+  // const [hovered, setHovered] = useState(false);
 
   return (
     <header>
-      <Wrapper className="p-sm flex flex-row space-between align-center">
+      <Wrapper className="p-sm flex justify-between items-center">
         <SiteBrand />
-        <button
-          className="btn header-btn"
+        {/* <button
+          className="btn btn-primary" 
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
         >
           {hovered ? "(402) 218-1489" : "CALL US NOW!"}
-        </button>
+        </button> */}
       </Wrapper>
       <Nav />
     </header>
