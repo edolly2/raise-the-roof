@@ -1,290 +1,225 @@
-import {
-  useState,
-  useRef,
-  useEffect,
-  useCallback,
-  useLayoutEffect,
-  memo,
-} from "react";
-
+/* eslint-disable no-unused-vars */
+import "./PhotoCarousel.css";
 import Img1 from "../../assets/images/example-img1.webp";
 import Img2 from "../../assets/images/example-img2.webp";
 import Img3 from "../../assets/images/example-img3.webp";
 
-const PhotoCarousel = memo(
-  ({
-    images = [Img1, Img2, Img3],
-    autoPlay = true,
-    interval = 5000,
-    showNavigation = true,
-    showIndicators = true,
-    transitionDuration = 500,
-    accessibilityLabel = "Image carousel",
-  }) => {
-    // State management
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [isTransitioning, setIsTransitioning] = useState(false);
-    const [containerWidth, setContainerWidth] = useState(0);
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 
-    // Refs for DOM elements and timers
-    const carouselRef = useRef(null);
-    const containerRef = useRef(null);
-    const timerRef = useRef(null);
-    const touchStartX = useRef(0);
-    const touchEndX = useRef(0);
+const PhotoCarousel = ({
+  images = [Img1, Img2, Img3],
+  autoPlay = true,
+  interval = 5000,
+  showNavigation = true,
+  showIndicators = true,
+  accessibilityLabels = {
+    previous: "Previous slide",
+    next: "Next slide",
+    slide: "Slide",
+  },
+}) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const prefersReducedMotion = useReducedMotion();
+  const [isPaused, setIsPaused] = useState(false);
+  const [direction, setDirection] = useState(0);
 
-    // Memoized callbacks
-    const goToSlide = useCallback(
-      (index) => {
-        if (index < 0) {
-          setCurrentIndex(images.length - 1);
-        } else if (index >= images.length) {
-          setCurrentIndex(0);
-        } else {
-          setCurrentIndex(index);
-        }
-        setIsTransitioning(true);
-      },
-      [images.length]
-    );
+  useEffect(() => {
+    if (!autoPlay || isPaused || prefersReducedMotion) return;
 
-    const nextSlide = useCallback(() => {
-      goToSlide(currentIndex + 1);
-    }, [currentIndex, goToSlide]);
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % images.length);
+    }, interval);
 
-    const prevSlide = useCallback(() => {
-      goToSlide(currentIndex - 1);
-    }, [currentIndex, goToSlide]);
+    return () => clearInterval(timer);
+  }, [autoPlay, interval, isPaused, prefersReducedMotion, images.length]);
 
-    // Auto play functionality
-    useEffect(() => {
-      if (!autoPlay) return;
+  const goToSlide = useCallback(
+    (index) => {
+      setDirection(index > currentIndex ? 1 : -1);
+      setCurrentIndex(index);
+      setIsPaused(true);
+      setTimeout(() => setIsPaused(false), 3000);
+    },
+    [currentIndex]
+  );
 
-      timerRef.current = setInterval(() => {
-        nextSlide();
-      }, interval);
+  const nextSlide = useCallback(() => {
+    setDirection(1);
+    setCurrentIndex((prev) => (prev + 1) % images.length);
+  }, [images.length]);
 
-      return () => {
-        if (timerRef.current) {
-          clearInterval(timerRef.current);
-        }
-      };
-    }, [autoPlay, interval, nextSlide]);
+  const prevSlide = useCallback(() => {
+    setDirection(-1);
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  }, [images.length]);
 
-    // Reset timer on user interaction
-    const resetTimer = useCallback(() => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = setInterval(() => {
-          nextSlide();
-        }, interval);
-      }
-    }, [interval, nextSlide]);
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "ArrowRight") nextSlide();
+      if (e.key === "ArrowLeft") prevSlide();
+    };
 
-    // Handle transition end
-    const handleTransitionEnd = useCallback(() => {
-      setIsTransitioning(false);
-      // Ensure we're at the correct index after transition
-      if (currentIndex < 0) {
-        setCurrentIndex(images.length - 1);
-      } else if (currentIndex >= images.length) {
-        setCurrentIndex(0);
-      }
-    }, [currentIndex, images.length]);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [nextSlide, prevSlide]);
 
-    // Touch handling for mobile
-    const handleTouchStart = useCallback((e) => {
-      touchStartX.current = e.touches[0].clientX;
-    }, []);
+  const slideVariants = {
+    enter: (direction) => ({
+      x: direction > 0 ? "100%" : "-100%",
+      opacity: 0,
+      position: "absolute",
+      width: "100%",
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+      position: "relative",
+      width: "100%",
+      transition: prefersReducedMotion
+        ? { duration: 0 }
+        : { duration: 0.8, ease: [0.34, 1.56, 0.64, 1] },
+    },
+    exit: (direction) => ({
+      x: direction < 0 ? "100%" : "-100%",
+      opacity: 0,
+      position: "absolute",
+      width: "100%",
+      transition: prefersReducedMotion
+        ? { duration: 0 }
+        : { duration: 0.6, ease: [0.34, 1.56, 0.64, 1] },
+    }),
+  };
 
-    const handleTouchMove = useCallback((e) => {
-      touchEndX.current = e.touches[0].clientX;
-    }, []);
+  const swipeConfidenceThreshold = 10000;
+  const swipePower = (offset, velocity) => Math.abs(offset) * velocity;
 
-    const handleTouchEnd = useCallback(() => {
-      if (touchStartX.current - touchEndX.current > 50) {
-        nextSlide();
-        resetTimer();
-      }
+  const handleDragEnd = (_, { offset, velocity }) => {
+    const swipe = swipePower(offset.x, velocity.x);
 
-      if (touchStartX.current - touchEndX.current < -50) {
-        prevSlide();
-        resetTimer();
-      }
-    }, [nextSlide, prevSlide, resetTimer]);
-
-    // Keyboard navigation
-    const handleKeyDown = useCallback(
-      (e) => {
-        if (e.key === "ArrowRight") {
-          nextSlide();
-          resetTimer();
-        } else if (e.key === "ArrowLeft") {
-          prevSlide();
-          resetTimer();
-        }
-      },
-      [nextSlide, prevSlide, resetTimer]
-    );
-
-    // Resize handling
-    useLayoutEffect(() => {
-      const updateWidth = () => {
-        if (containerRef.current) {
-          setContainerWidth(containerRef.current.offsetWidth);
-        }
-      };
-
-      updateWidth();
-      const resizeObserver = new ResizeObserver(updateWidth);
-
-      if (containerRef.current) {
-        resizeObserver.observe(containerRef.current);
-      }
-
-      return () => {
-        if (containerRef.current) {
-          resizeObserver.unobserve(containerRef.current);
-        }
-      };
-    }, []);
-
-    // Event listeners setup
-    useEffect(() => {
-      window.addEventListener("keydown", handleKeyDown);
-      return () => {
-        window.removeEventListener("keydown", handleKeyDown);
-      };
-    }, [handleKeyDown]);
-
-    // Validate required props
-    if (!images.length) {
-      console.warn(
-        "PhotoCarousel requires at least one image in the images array"
-      );
-      return null;
+    if (swipe < -swipeConfidenceThreshold) {
+      setDirection(1);
+      nextSlide();
+    } else if (swipe > swipeConfidenceThreshold) {
+      setDirection(-1);
+      prevSlide();
     }
+  };
 
-    // Render the carousel
-    return (
-      <>
-        <div
-          ref={containerRef}
-          className="photo-carousel-container"
-          aria-label={accessibilityLabel}
-          role="region"
-          tabIndex="0"
-          onKeyDown={handleKeyDown}
-        >
-          <div
-            ref={carouselRef}
-            className="photo-carousel"
-            style={{
-              transform: `translateX(-${currentIndex * 100}%)`,
-              transition: isTransitioning
-                ? `transform ${transitionDuration}ms ease-in-out`
-                : "none",
-            }}
-            onTransitionEnd={handleTransitionEnd}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
+  return (
+    <div
+      className="slideshow relative w-full max-w-[1200px] mx-auto"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Image slideshow"
+    >
+      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl shadow-xl">
+        <AnimatePresence initial={false} custom={direction}>
+          <motion.div
+            key={currentIndex}
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.1}
+            onDragEnd={handleDragEnd}
+            aria-hidden={false}
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`${accessibilityLabels.slide} ${currentIndex + 1} of ${
+              images.length
+            }`}
+            tabIndex={0}
           >
-            {/* Clone first and last slides for infinite scroll effect */}
-            <div
-              className="carousel-slide"
-              style={{ width: `${containerWidth}px` }}
-              aria-hidden={currentIndex !== images.length - 1}
-            >
-              <img
-                src={images[images.length - 1]}
-                alt={`Previous: ${
-                  currentIndex > 0 ? currentIndex : images.length
-                } of ${images.length}`}
-                loading="lazy"
-              />
-            </div>
+            <img
+              src={images[currentIndex]}
+              alt={`Slide ${currentIndex + 1}`}
+              className="w-full h-full object-cover"
+              loading="eager"
+              fetchPriority="high"
+            />
+          </motion.div>
+        </AnimatePresence>
 
-            {images.map((src, index) => (
-              <div
-                key={`slide-${index}`}
-                className="carousel-slide"
-                style={{ width: `${containerWidth}px` }}
-                aria-hidden={currentIndex !== index}
-              >
-                <img
-                  src={src}
-                  alt={`Slide ${index + 1} of ${images.length}`}
-                  aria-current={currentIndex === index ? "true" : "false"}
-                  loading={index === currentIndex ? "eager" : "lazy"}
-                />
-              </div>
-            ))}
-
-            <div
-              className="carousel-slide"
-              style={{ width: `${containerWidth}px` }}
-              aria-hidden={currentIndex !== 0}
-            >
-              <img
-                src={images[0]}
-                alt={`Next: ${
-                  currentIndex < images.length - 1 ? currentIndex + 2 : 1
-                } of ${images.length}`}
-                loading="lazy"
-              />
-            </div>
-          </div>
-        </div>
-        {/* Navigation controls */}
         {showNavigation && (
           <>
-            <button
-              className="carousel-control prev"
-              onClick={() => {
-                prevSlide();
-                resetTimer();
-              }}
-              aria-label="Previous slide"
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-3 rounded-full z-10 transition-all hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white"
+              onClick={prevSlide}
+              aria-label={accessibilityLabels.previous}
             >
-              &lt;
-            </button>
-            <button
-              className="carousel-control next"
-              onClick={() => {
-                nextSlide();
-                resetTimer();
-              }}
-              aria-label="Next slide"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-3 rounded-full z-10 transition-all hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white"
+              onClick={nextSlide}
+              aria-label={accessibilityLabels.next}
             >
-              &gt;
-            </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </motion.button>
           </>
         )}
-        {/* Indicators */}
-        {showIndicators && (
-          <div className="carousel-indicators" role="tablist">
-            {images.map((_, index) => (
-              <button
-                key={`indicator-${index}`}
-                className={`carousel-indicator${
-                  currentIndex === index ? " active" : ""
-                }`}
-                onClick={() => {
-                  goToSlide(index);
-                  resetTimer();
-                }}
-                aria-label={`Go to slide ${index + 1}`}
-                aria-selected={currentIndex === index}
-                role="tab"
-                tabIndex={currentIndex === index ? 0 : -1}
-              />
-            ))}
-          </div>
-        )}
-      </>
-    );
-  }
-);
+      </div>
+
+      {showIndicators && (
+        <div className="flex justify-center space-x-2 mt-4" role="tablist">
+          {images.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              aria-label={`Go to slide ${index + 1}`}
+              aria-selected={index === currentIndex}
+              role="tab"
+              tabIndex={index === currentIndex ? 0 : -1}
+              className={`w-3 h-3 rounded-full ${
+                index === currentIndex ? "bg-black" : "bg-gray-400"
+              }`}
+            />
+          ))}
+        </div>
+      )}
+
+      {autoPlay && (
+        <div className="sr-only" aria-live="polite">
+          {isPaused ? "Slideshow paused" : "Slideshow is playing"}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default PhotoCarousel;
