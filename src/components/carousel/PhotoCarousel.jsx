@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import "./PhotoCarousel.css";
 import Img1 from "../../assets/images/example-img1.webp";
 import Img2 from "../../assets/images/example-img2.webp";
@@ -133,21 +134,23 @@ const Slideshow = ({
     >
       <div className="slideshow-track">
         {images.map((url, index) => (
-          <div
-            key={index}
-            className={`slideshow-slide ${
-              index === currentIndex ? "active" : ""
-            }`}
-            style={getSlideStyle(index)}
-            aria-hidden={index !== currentIndex}
-          >
-            <img
-              src={url}
-              alt={`Slide ${index + 1} of ${images.length}`}
-              loading={index === currentIndex ? "eager" : "lazy"}
-              fetchPriority={index === currentIndex ? "high" : "low"}
-            />
-          </div>
+          <Link to="/services">
+            <div
+              key={index}
+              className={`slideshow-slide ${
+                index === currentIndex ? "active" : ""
+              }`}
+              style={getSlideStyle(index)}
+              aria-hidden={index !== currentIndex}
+            >
+              <img
+                src={url}
+                alt={`Slide ${index + 1} of ${images.length}`}
+                loading={index === currentIndex ? "eager" : "lazy"}
+                fetchPriority={index === currentIndex ? "high" : "low"}
+              />
+            </div>
+          </Link>
         ))}
       </div>
 
