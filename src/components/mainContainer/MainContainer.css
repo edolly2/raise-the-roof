@@ -3,4 +3,5 @@ main {
   /* position: relative; */
   /* margin: var(--space-xl) auto; */
   /* overflow-x: hidden; */
+  padding: var(--space-lg);
 }
