@@ -1,59 +1,110 @@
 /* eslint-disable no-unused-vars */
+import { useState, useEffect, useRef } from "react";
 import "./PhotoCarousel.css";
 import Img1 from "../../assets/images/example-img1.webp";
 import Img2 from "../../assets/images/example-img2.webp";
 import Img3 from "../../assets/images/example-img3.webp";
 
-import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "motion/react";
-
-const PhotoCarousel = ({
+const Slideshow = ({
   images = [Img1, Img2, Img3],
   autoPlay = true,
   interval = 5000,
   showNavigation = true,
   showIndicators = true,
-  accessibilityLabels = {
-    previous: "Previous slide",
-    next: "Next slide",
-    slide: "Slide",
-  },
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const prefersReducedMotion = useReducedMotion();
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [direction, setDirection] = useState(0);
+  const slideshowRef = useRef(null);
+  const intervalRef = useRef(null);
 
+  // Handle auto-play
   useEffect(() => {
-    if (!autoPlay || isPaused || prefersReducedMotion) return;
+    if (!autoPlay || isPaused) {
+      clearInterval(intervalRef.current);
+      return;
+    }
 
-    const timer = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % images.length);
     }, interval);
 
-    return () => clearInterval(timer);
-  }, [autoPlay, interval, isPaused, prefersReducedMotion, images.length]);
+    return () => clearInterval(intervalRef.current);
+  }, [autoPlay, interval, isPaused, images.length]);
 
-  const goToSlide = useCallback(
-    (index) => {
-      setDirection(index > currentIndex ? 1 : -1);
-      setCurrentIndex(index);
-      setIsPaused(true);
-      setTimeout(() => setIsPaused(false), 3000);
-    },
-    [currentIndex]
-  );
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => clearInterval(intervalRef.current);
+  }, []);
 
-  const nextSlide = useCallback(() => {
-    setDirection(1);
+  // Handle touch events for mobile
+  const handleTouchStart = (e) => {
+    setIsDragging(true);
+    setStartX(e.touches[0].clientX);
+    setDragOffset(0);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging) return;
+
+    const currentX = e.touches[0].clientX;
+    const diff = currentX - startX;
+
+    // Only allow horizontal movement
+    if (Math.abs(diff) > 10) {
+      e.preventDefault();
+    }
+
+    setDragOffset(diff);
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging) return;
+
+    const threshold = slideshowRef.current.offsetWidth * 0.2;
+
+    if (dragOffset > threshold) {
+      prevSlide();
+    } else if (dragOffset < -threshold) {
+      nextSlide();
+    }
+
+    setIsDragging(false);
+    setDragOffset(0);
+  };
+
+  const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % images.length);
-  }, [images.length]);
+    setIsPaused(true);
+    setTimeout(() => setIsPaused(false), 3000);
+  };
 
-  const prevSlide = useCallback(() => {
-    setDirection(-1);
+  const prevSlide = () => {
     setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
-  }, [images.length]);
+    setIsPaused(true);
+    setTimeout(() => setIsPaused(false), 3000);
+  };
 
+  // Calculate slide position for drag effect
+  const getSlideStyle = (index) => {
+    if (index === currentIndex) {
+      return { transform: `translateX(${dragOffset}px)` };
+    }
+
+    if (index === (currentIndex - 1 + images.length) % images.length) {
+      return { transform: `translateX(-100%)` };
+    }
+
+    if (index === (currentIndex + 1) % images.length) {
+      return { transform: `translateX(100%)` };
+    }
+
+    return { transform: "translateX(100%)", opacity: 0 };
+  };
+
+  // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "ArrowRight") nextSlide();
@@ -64,155 +115,93 @@ const PhotoCarousel = ({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [nextSlide, prevSlide]);
 
-  const slideVariants = {
-    enter: (direction) => ({
-      x: direction > 0 ? "100%" : "-100%",
-      opacity: 0,
-      position: "absolute",
-      width: "100%",
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-      position: "relative",
-      width: "100%",
-      transition: prefersReducedMotion
-        ? { duration: 0 }
-        : { duration: 0.8, ease: [0.34, 1.56, 0.64, 1] },
-    },
-    exit: (direction) => ({
-      x: direction < 0 ? "100%" : "-100%",
-      opacity: 0,
-      position: "absolute",
-      width: "100%",
-      transition: prefersReducedMotion
-        ? { duration: 0 }
-        : { duration: 0.6, ease: [0.34, 1.56, 0.64, 1] },
-    }),
-  };
-
-  const swipeConfidenceThreshold = 10000;
-  const swipePower = (offset, velocity) => Math.abs(offset) * velocity;
-
-  const handleDragEnd = (_, { offset, velocity }) => {
-    const swipe = swipePower(offset.x, velocity.x);
-
-    if (swipe < -swipeConfidenceThreshold) {
-      setDirection(1);
-      nextSlide();
-    } else if (swipe > swipeConfidenceThreshold) {
-      setDirection(-1);
-      prevSlide();
-    }
-  };
+  // Handle reduced motion preference
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches;
 
   return (
     <div
-      className="slideshow relative w-full max-w-[1200px] mx-auto"
+      className="slideshow-container"
+      ref={slideshowRef}
       role="region"
       aria-roledescription="carousel"
       aria-label="Image slideshow"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
-      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl shadow-xl">
-        <AnimatePresence initial={false} custom={direction}>
-          <motion.div
-            key={currentIndex}
-            custom={direction}
-            variants={slideVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.1}
-            onDragEnd={handleDragEnd}
-            aria-hidden={false}
-            role="group"
-            aria-roledescription="slide"
-            aria-label={`${accessibilityLabels.slide} ${currentIndex + 1} of ${
-              images.length
+      <div className="slideshow-track">
+        {images.map((url, index) => (
+          <div
+            key={index}
+            className={`slideshow-slide ${
+              index === currentIndex ? "active" : ""
             }`}
-            tabIndex={0}
+            style={getSlideStyle(index)}
+            aria-hidden={index !== currentIndex}
           >
             <img
-              src={images[currentIndex]}
-              alt={`Slide ${currentIndex + 1}`}
-              className="w-full h-full object-cover"
-              loading="eager"
-              fetchPriority="high"
+              src={url}
+              alt={`Slide ${index + 1} of ${images.length}`}
+              loading={index === currentIndex ? "eager" : "lazy"}
+              fetchPriority={index === currentIndex ? "high" : "low"}
             />
-          </motion.div>
-        </AnimatePresence>
-
-        {showNavigation && (
-          <>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-3 rounded-full z-10 transition-all hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white"
-              onClick={prevSlide}
-              aria-label={accessibilityLabels.previous}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </motion.button>
-
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-3 rounded-full z-10 transition-all hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white"
-              onClick={nextSlide}
-              aria-label={accessibilityLabels.next}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </motion.button>
-          </>
-        )}
+          </div>
+        ))}
       </div>
 
-      {showIndicators && (
-        <div className="flex justify-center space-x-2 mt-4" role="tablist">
+      {/* Navigation controls */}
+      {showNavigation && (
+        <>
+          <button
+            className="slideshow-prev"
+            onClick={prevSlide}
+            aria-label="Previous slide"
+            disabled={images.length <= 1}
+          >
+            <span className="sr-only">Previous</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </button>
+
+          <button
+            className="slideshow-next"
+            onClick={nextSlide}
+            aria-label="Next slide"
+            disabled={images.length <= 1}
+          >
+            <span className="sr-only">Next</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        </>
+      )}
+
+      {/* Slide indicators */}
+      {showIndicators && images.length > 1 && (
+        <div className="slideshow-dots" role="tablist">
           {images.map((_, index) => (
             <button
               key={index}
-              onClick={() => goToSlide(index)}
+              className={`slideshow-dot ${
+                index === currentIndex ? "active" : ""
+              }`}
+              onClick={() => setCurrentIndex(index)}
               aria-label={`Go to slide ${index + 1}`}
               aria-selected={index === currentIndex}
               role="tab"
               tabIndex={index === currentIndex ? 0 : -1}
-              className={`w-3 h-3 rounded-full ${
-                index === currentIndex ? "bg-black" : "bg-gray-400"
-              }`}
-            />
+            >
+              <span className="sr-only">Slide {index + 1}</span>
+            </button>
           ))}
         </div>
       )}
 
+      {/* Auto-play status for screen readers */}
       {autoPlay && (
         <div className="sr-only" aria-live="polite">
           {isPaused ? "Slideshow paused" : "Slideshow is playing"}
@@ -222,4 +211,4 @@ const PhotoCarousel = ({
   );
 };
 
-export default PhotoCarousel;
+export default Slideshow;
