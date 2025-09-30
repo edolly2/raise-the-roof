@@ -121,6 +121,7 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -181,7 +182,7 @@ h6 {
 }
 
 p {
-  margin-bottom: var(--space-base);
+  /* margin-bottom: var(--space-base); */
   text-wrap: pretty;
 }
 
@@ -347,7 +348,8 @@ textarea::placeholder {
   width: 100%;
   max-width: var(--container-max-width);
   margin: 0 auto;
-  padding: 0 var(--container-padding);
+  /* padding: 0 var(--container-padding); */
+  overflow: hidden;
 }
 
 .sr-only {

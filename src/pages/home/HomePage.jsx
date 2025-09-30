@@ -11,7 +11,7 @@ const HomePage = () => {
           spaces with expert remodeling—all from one trusted team.
         </p>
       </div>
-      <div>
+      <div className="photo-carousel-container">
         <PhotoCarousel />
       </div>
       <div>
